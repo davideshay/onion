@@ -1,0 +1,78 @@
+diff -ruN -x '.*' SEAL/native/src/seal/context.cpp SEALNEW/native/src/seal/context.cpp
+--- SEAL/native/src/seal/context.cpp	2022-11-10 12:49:32.000000000 -0500
++++ SEALNEW/native/src/seal/context.cpp	2022-11-10 11:42:23.000000000 -0500
+@@ -207,18 +207,18 @@
+         // Assume parameters satisfy desired security level
+         context_data.qualifiers_.sec_level = sec_level_;
+ 
+-        // Check if the parameters are secure according to HomomorphicEncryption.org security standard
+-        if (context_data.total_coeff_modulus_bit_count_ > CoeffModulus::MaxBitCount(poly_modulus_degree, sec_level_))
+-        {
+-            // Not secure according to HomomorphicEncryption.org security standard
+-            context_data.qualifiers_.sec_level = sec_level_type::none;
+-            if (sec_level_ != sec_level_type::none)
+-            {
+-                // Parameters are not valid
+-                context_data.qualifiers_.parameter_error = error_type::invalid_parameters_insecure;
+-                return context_data;
+-            }
+-        }
++//      // Check if the parameters are secure according to HomomorphicEncryption.org security standard
++//      if (context_data.total_coeff_modulus_bit_count_ > CoeffModulus::MaxBitCount(poly_modulus_degree, sec_level_))
++//      {
++//          // Not secure according to HomomorphicEncryption.org security standard
++//          context_data.qualifiers_.sec_level = sec_level_type::none;
++//          if (sec_level_ != sec_level_type::none)
++//          {
++//              // Parameters are not valid
++//              context_data.qualifiers_.parameter_error = error_type::invalid_parameters_insecure;
++//              return context_data;
++//          }
++//      }
+ 
+         // Set up RNSBase for coeff_modulus
+         // RNSBase's constructor may fail due to:
+diff -ruN -x '.*' SEAL/native/src/seal/util/defines.h SEALNEW/native/src/seal/util/defines.h
+--- SEAL/native/src/seal/util/defines.h	2022-11-10 12:49:32.000000000 -0500
++++ SEALNEW/native/src/seal/util/defines.h	2022-11-10 11:41:15.000000000 -0500
+@@ -26,14 +26,14 @@
+ static_assert(sizeof(unsigned long long) == 8, "Require sizeof(unsigned long long) == 8");
+ 
+ // Bounds for bit-length of all coefficient moduli
+-#define SEAL_MOD_BIT_COUNT_MAX 61
++#define SEAL_MOD_BIT_COUNT_MAX 62
+ #define SEAL_MOD_BIT_COUNT_MIN 2
+ 
+ // Bit-length of internally used coefficient moduli, e.g., auxiliary base in BFV
+-#define SEAL_INTERNAL_MOD_BIT_COUNT 61
++#define SEAL_INTERNAL_MOD_BIT_COUNT 62
+ 
+ // Bounds for bit-length of user-defined coefficient moduli
+-#define SEAL_USER_MOD_BIT_COUNT_MAX 60
++#define SEAL_USER_MOD_BIT_COUNT_MAX 62
+ #define SEAL_USER_MOD_BIT_COUNT_MIN 2
+ 
+ // Bounds for bit-length of the plaintext modulus
+diff -ruN -x '.*' SEAL/native/src/seal/util/locks.h SEALNEW/native/src/seal/util/locks.h
+--- SEAL/native/src/seal/util/locks.h	2022-11-10 12:49:32.000000000 -0500
++++ SEALNEW/native/src/seal/util/locks.h	2022-11-10 12:48:23.000000000 -0500
+@@ -7,6 +7,7 @@
+ 
+ #ifdef SEAL_USE_SHARED_MUTEX
+ #include <shared_mutex>
++#include <mutex>
+ 
+ namespace seal
+ {
+diff -ruN -x '.*' SEAL/native/src/seal/util/rns.cpp SEALNEW/native/src/seal/util/rns.cpp
+--- SEAL/native/src/seal/util/rns.cpp	2022-11-10 12:49:32.000000000 -0500
++++ SEALNEW/native/src/seal/util/rns.cpp	2022-11-10 11:43:10.000000000 -0500
+@@ -585,7 +585,7 @@
+             }
+ 
+             // Sample primes for B and two more primes: m_sk and gamma
+-            auto baseconv_primes = get_primes(coeff_count_, SEAL_USER_MOD_BIT_COUNT_MAX + 1, base_Bsk_m_tilde_size);
++            auto baseconv_primes = get_primes(coeff_count_, SEAL_USER_MOD_BIT_COUNT_MAX , base_Bsk_m_tilde_size);
+             auto baseconv_primes_iter = baseconv_primes.cbegin();
+             m_sk_ = *baseconv_primes_iter++;
+             gamma_ = *baseconv_primes_iter++;
